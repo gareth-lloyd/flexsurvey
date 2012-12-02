@@ -1,0 +1,8 @@
+*.pyc
+*.py.swp
+*.css.swp
+*.html.swp
+*.js.swp
+.project
+
+.pydevproject
