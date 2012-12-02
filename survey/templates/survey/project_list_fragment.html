@@ -1,0 +1,13 @@
+{% load url from future %}
+{% for project in projects %}
+    <h3>{{ project.name }}</h3>
+    <div>
+        <ul>
+            {% for survey in project.survey_set.all %}
+            <li>
+                <a href="{% url "survey-detail" survey.id %}">{{ survey.name }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endfor %}

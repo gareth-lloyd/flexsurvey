@@ -1,0 +1,29 @@
+{% extends "survey/project_list.html" %}
+{% block content %}
+        <h3>Survey: {{ survey.name }}</h3>
+        <div class="box-container">
+            <div id="desired-facts" class="box">
+                <h4>Desired Facts</h4>
+                <table id="desired-facts" class="child-table">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Label</th>
+                            <th>Prompt Type</th>
+                            <th>Required?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for desired_fact in desired_facts %}
+                            <tr>
+                                <td>{{ desired_fact.code }}</td>
+                                <td>{{ desired_fact.label }}</td>
+                                <td>{{ desired_fact.get_data_type_display }}</td>
+                                <td>{{ desired_fact.required }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+{% endblock %}

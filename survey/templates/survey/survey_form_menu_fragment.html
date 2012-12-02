@@ -1,0 +1,14 @@
+<div class="form-menu">
+    {% for fieldset in form.fieldsets %}
+    <a href="#fieldset-{{ forloop.counter }}">
+        <div class="form-menu-item">
+            {{ fieldset.legend }}
+        </div>
+    </a>
+    {% endfor %}
+    <a href="#fieldset-submit">
+        <div class="form-menu-item last" target="fieldset-submit">
+            Submit
+        </div>
+    </a>
+</div>

@@ -1,0 +1,15 @@
+<h4>Survey Subjects</h4>
+{% for content_type, items in subjects.items %}
+    <table class="child-table" id="{{ content_type.name }}-subjects">
+        <thead>
+            <tr>
+                {% include "survey/subject_header_row_fragment.html" %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in items %}
+                {% include "survey/subject_row_fragment.html" %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}

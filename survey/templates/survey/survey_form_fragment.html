@@ -1,0 +1,26 @@
+{% load url from future %}
+<span class="required-notice">* denotes required fields</span>
+<form method="POST">
+    {% csrf_token %}
+    {% for fieldset in form.fieldsets %}
+        <h3 id="fieldset-{{ forloop.counter }}"><a href="#">{{ fieldset.legend }}</a></h3>
+        <ul class="form-list">
+        {% for field in fieldset %}
+            <li>
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.field.required %}
+                    <span class="required">*</span>
+                {% endif %}
+                {% for error in field.errors %}
+                    <span class="error-message">{{ error }}</span>
+                {% endfor %}
+            </li>
+        {% endfor %}
+        </ul>
+    <fieldset id="fieldset-submit" class="submit">
+        <input type="submit" name="Submit"/>
+        <input type="submit" name="Save" value="Save"/>
+        <a href="{% url "survey-detail" survey.pk %}">Discard</a>
+    </fieldset>
+</form>

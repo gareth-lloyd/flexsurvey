@@ -1,0 +1,12 @@
+{% load url from future %}
+    <tr>
+        <td>{{ subject }}</td>
+        <td>
+            {% if subject.has_required_data %}No{% else %}Yes{% endif %}
+        </td>
+        <td>
+            <a href="{% url "data-entry" survey.pk content_type.pk subject.pk %}">
+                Add/Edit Facts
+            </a>
+        </td>
+    </tr>
