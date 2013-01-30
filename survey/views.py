@@ -153,13 +153,17 @@ def ajax_fact(request, survey_id):
     code = request.POST.get('code')
     data = {code: request.POST.get('data')}
 
+    _update_fact(survey, subject, code, content_type, data, request.user)
+
+    return HttpResponse(json.dumps({'success': True}),
+                        content_type="application/json")
+
+def _update_fact(survey, subject, code, content_type, data, user):
     # create a miniature form for this desired fact only, and save the fact
     sdfs = models.SurveyDesiredFact.objects\
             .filter(survey=survey, desired_fact__code=code)
     form_class = forms._survey_form_subclass(forms.BaseSurveyForm, sdfs)
-    form = form_class(subject=subject, survey=survey, user=request.user, data=data)
+    form = form_class(subject=subject, survey=survey, user=user, data=data)
     form.save_valid()
 
-    return HttpResponse(json.dumps({'success': True}),
-                        content_type="application/json")
 
