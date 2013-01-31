@@ -140,30 +140,37 @@ class EditSurveySubjectView(FormView):
         return ['survey/edit_survey_%s.html' % self.content_type.name,
                 "survey/edit_survey_subject.html"]
 
-@login_required
-def ajax_fact(request, survey_id):
-    survey = get_object_or_404(models.Survey, pk=survey_id)
-
-    content_type_id = request.POST.get('contentTypeId')
-    content_type = get_object_or_404(ContentType, pk=content_type_id)
-
-    object_id = request.POST.get('objectId')
-    subject = content_type.get_object_for_this_type(pk=object_id)
-
-    code = request.POST.get('code')
-    data = {code: request.POST.get('data')}
-
-    _update_fact(survey, subject, code, content_type, data, request.user)
-
-    return HttpResponse(json.dumps({'success': True}),
-                        content_type="application/json")
-
 def _update_fact(survey, subject, code, content_type, data, user):
     # create a miniature form for this desired fact only, and save the fact
-    sdfs = models.SurveyDesiredFact.objects\
-            .filter(survey=survey, desired_fact__code=code)
-    form_class = forms._survey_form_subclass(forms.BaseSurveyForm, sdfs)
+    sdf = models.SurveyDesiredFact.objects\
+            .get(survey=survey, desired_fact__code=code,
+                    desired_fact__content_type=content_type)
+    form_class = forms._survey_form_subclass(forms.BaseSurveyForm, [sdf])
     form = form_class(subject=subject, survey=survey, user=user, data=data)
     form.save_valid()
+    return form
 
+@login_required
+def ajax_fact(request, survey_id):
+    def json_response(success):
+        return HttpResponse(json.dumps({'success': bool(success)}),
+                            content_type="application/json")
+
+    try:
+        content_type_id = request.POST.get('contentTypeId')
+        object_id = request.POST.get('objectId')
+    except ValueError:
+        return json_response(False)
+
+    try:
+        survey = models.Survey.objects.get(pk=survey_id)
+        content_type = ContentType.objects.get(pk=content_type_id)
+    except (models.Survey.DoesNotExist, ContentType.DoesNotExist):
+        return json_response(False)
+
+    subject = content_type.get_object_for_this_type(pk=object_id)
+    code = request.POST.get('code')
+    data = {code: request.POST.get('data')}
+    form = _update_fact(survey, subject, code, content_type, data, request.user)
+    return json_response(form.is_valid)
 
