@@ -157,8 +157,8 @@ def ajax_fact(request, survey_id):
                             content_type="application/json")
 
     try:
-        content_type_id = request.POST.get('contentTypeId')
-        object_id = request.POST.get('objectId')
+        content_type_id = int(request.POST.get('contentTypeId'))
+        object_id = int(request.POST.get('objectId'))
     except ValueError:
         return json_response(False)
 
