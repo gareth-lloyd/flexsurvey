@@ -138,6 +138,9 @@ class BaseSurveyForm(BetterForm):
         models.Fact.create_or_update(self.survey, desired_fact, content_type,
                 self.subject.id, data, self.user)
 
+def _get_ordered_fact_groups(dfs_by_fact_group):
+    return sorted(dfs_by_fact_group.iteritems(),
+            key=lambda pair: pair[0].weight)
 
 def _survey_form_subclass(base_class, survey_desired_facts):
     """The desired facts for the survey are examined and used to
@@ -154,7 +157,8 @@ def _survey_form_subclass(base_class, survey_desired_facts):
         form_attrs[sdf.desired_fact.code] = field
         dfs_by_fact_group[sdf.fact_group].append(sdf.desired_fact)
 
-    for fact_group, desired_facts in dfs_by_fact_group.iteritems():
+    ordered_fact_groups = _get_ordered_fact_groups(dfs_by_fact_group)
+    for fact_group, desired_facts in ordered_fact_groups:
         fieldset_opts = {
             'fields': [df.code for df in desired_facts],
             'legend': fact_group.heading,
@@ -174,3 +178,4 @@ def make_survey_form_subclass(survey, content_type):
             .select_related('fact_group', 'desired_fact')\
             .order_by('fact_group__weight', 'weight', 'desired_fact__code')
     return _survey_form_subclass(BaseSurveyForm, sdfs)
+
