@@ -115,19 +115,14 @@ class ExcelExport(object):
         return worksheet
 
     def make_cell(self, data, code, **kwargs):
-        if isinstance(code, (basestring)):
-            value = data.get(code)
-        else:
-            value = code['func'](self.survey, self.slum, **kwargs)
-
-        if value is None or value is '':
+        values = data.getlist(code)
+        if values == []:
             if not self.allow_blank or code in self.allow_blank:
-                value = ''
+                values = ['']
             else:
-                value = '0'
-            return value
-        else:
-            return str(value)
+                values = ['0']
+
+        return ', '.join(map(str, values))
 
     def make_row(self, data, codes, **kwargs):
         return [self.make_cell(data, code, **kwargs) for code in codes]
