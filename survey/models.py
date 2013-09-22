@@ -49,8 +49,31 @@ class Survey(models.Model):
         return [ContentType.objects.get(id=c_type_id)
                 for c_type_id in c_type_ids]
 
+    @property
+    def subject(self):
+        try:
+            SurveySubject.objects.get(survey=self, parent=None)
+        except SurveySubject.MultipleObjectsReturned:
+            raise ValueError("Multiple top-level SurveySubjects for this "\
+                    "survey. This must be fixed before continuing.")
+
+    def child_subjects(self, current_content_type):
+        return SurveySubject.objects.filter(survey=self,
+                 parent__content_type=current_content_type)
+
     def __unicode__(self):
         return self.name
+
+
+class SurveySubject(models.Model):
+    """Records the types of things that a particular survey is designed to
+    interrogate. These things may be arranged in a hierarchy, I.e. a 'household'
+    entity may contain several 'member' entities.
+    """
+    survey = models.ForeignKey(Project)
+    parent = models.ForeignKey('survey.SurveySubject', blank=True, null=True)
+    content_type = models.ForeignKey(ContentType)
+    allow_multiple = models.BooleanField(default=True)
 
 
 class DesiredFact(models.Model):
@@ -90,7 +113,7 @@ class FactOption(models.Model):
     """Possible values that a particular desired fact can take.
     """
     desired_fact = models.ForeignKey(DesiredFact)
-    code = models.CharField(max_length=1024)
+    code = models.CharField(max_length=128)
     description = models.CharField(max_length=1024)
 
     def __unicode__(self):
@@ -251,4 +274,5 @@ def has_required_data(survey, subject):
             content_type=content_type, object_id=subject.id)\
             .values_list('desired_fact_id', flat=True)
     return not set(required_ids).difference(set(present_ids))
+
 

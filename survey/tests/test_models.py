@@ -14,9 +14,9 @@ class DesiredFactTests(TestCase):
                 required=True, content_type=self.content_type)
 
     def test_choices(self):
-        FactOption.objects.create(code='1', description='a', 
+        FactOption.objects.create(code='1', description='a',
                 desired_fact=self.desired_fact)
-        FactOption.objects.create(code='2', description='b', 
+        FactOption.objects.create(code='2', description='b',
                 desired_fact=self.desired_fact)
 
         self.assertEquals([('1', '1-a'), ('2', '2-b')],
@@ -26,7 +26,7 @@ class FactTests(SurveyTestCase):
     def setUp(self):
         super(FactTests, self).setUp()
         self.login()
-    
+
     def _set_desired_fact_data_type(self, _type):
         self.desired_fact.data_type = _type
         self.desired_fact.save()
